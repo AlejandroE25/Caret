@@ -1,0 +1,5 @@
+test/**
+SPEC.md
+tasks/**
+.gitignore
+*.vsix
