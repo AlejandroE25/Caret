@@ -3,3 +3,5 @@ SPEC.md
 tasks/**
 .gitignore
 *.vsix
+assets/**
+scripts/**

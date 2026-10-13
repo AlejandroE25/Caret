@@ -29,6 +29,28 @@ A theme can't set these. Add them to your user `settings.json`:
 "workbench.experimental.modernUI": false
 ```
 
+## App icon
+
+`assets/app-icon.png` puts the Caret icon on VS Code itself (Dock, Finder, Launchpad, Spotlight). VS Code updates
+replace the app, so re-apply it after each update.
+
+```bash
+npm run icon         # apply
+npm run icon:reset   # back to the stock icon
+npm run icon:render  # rebuild the PNG after editing assets/app-icon.svg
+```
+
+macOS only lets a terminal change another app if that terminal has **App Management** access
+(System Settings > Privacy & Security > App Management). Without it, do it by hand: open `assets/app-icon.png`
+in Preview, copy it, select Visual Studio Code in Applications, press Cmd+I, click the small icon at the top
+left of the Info window and paste.
+
+For the window title, add this to your settings:
+
+```jsonc
+"window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}Caret"
+```
+
 ## What a theme can't reach
 
 VS Code has no setting for the interface font, button bevels, corner radius or the bottom panel's tab-strip

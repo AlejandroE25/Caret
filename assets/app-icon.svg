@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- macOS icon grid: 824px tile centered on a 1024 canvas. Bars are the Stacks GUI favicon scaled up. -->
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="#262626" stroke="#444444" stroke-width="4"/>
+  <rect x="255" y="280" width="514" height="103" fill="#7aaee8"/>
+  <rect x="255" y="461" width="514" height="103" fill="#3c5070"/>
+  <rect x="255" y="642" width="514" height="103" fill="#7aaee8"/>
+</svg>
