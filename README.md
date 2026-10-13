@@ -16,14 +16,17 @@ code --install-extension caret-0.1.0.vsix
 
 Then pick **Caret** from *Preferences: Color Theme*.
 
-## Fonts
+## Settings
 
-A theme can't set fonts. Add these to your user `settings.json` to match the family:
+A theme can't set these. Add them to your user `settings.json`:
 
 ```jsonc
+"workbench.colorTheme": "Caret",
 "editor.fontFamily": "Menlo, monospace",
 "terminal.integrated.fontFamily": "Menlo",
-"workbench.colorTheme": "Caret"
+// VS Code 1.14x's "modern UI" forces section headers to the sidebar color and rounds the panels.
+// Turning it off brings back the blue iKB header bars and square corners.
+"workbench.experimental.modernUI": false
 ```
 
 ## What a theme can't reach

@@ -58,6 +58,8 @@ functions `--text-strong`, errors `--red`.
 3. Sidebar section headers (OPEN EDITORS, OUTLINE, etc.), panel section headers, the quick-pick title, peek
    titles and the notification center header read as iKB blue bars with white text. VS Code has no key for
    the bottom panel's tab-strip background, so that strip stays `--bg` with an `--accent` underline.
+   This needs `"workbench.experimental.modernUI": false`: VS Code 1.141 turns modern UI on by default, and its
+   stylesheet paints every section header with `sideBar.background` using `!important`, which no theme can override.
 4. Primary buttons are `--accent-fill` with a `--accent` 1px border, matching Rubric's `.btn-primary`.
 5. All primary text pairs pass WCAG AA (4.5:1). Secondary text (line numbers, placeholders, descriptions)
    passes 3:1. A test enforces both.
