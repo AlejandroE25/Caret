@@ -117,3 +117,45 @@ test('syntax colors reach 4.5:1 on the editor, comments 3:1', () => {
     .map(([s, r]) => `${s}: ${r.toFixed(2)}`);
   assert.deepStrictEqual(failing, []);
 });
+
+// TextMate rule matching as VS Code does it: a selector matches a scope equal to it or one of its
+// dotted descendants; the longest selector wins, and a later rule wins a tie.
+function syntaxColor(scope) {
+  let best = { len: -1, color: theme.colors['editor.foreground'] };
+  for (const rule of theme.tokenColors) {
+    if (!rule.settings.foreground) continue;
+    for (const sel of [].concat(rule.scope)) {
+      if ((scope === sel || scope.startsWith(sel + '.')) && sel.length >= best.len)
+        best = { len: sel.length, color: rule.settings.foreground };
+    }
+  }
+  return best.color;
+}
+
+// Scopes Tinymist emits for Typst (semantic tokens map to the first scope in each list it declares).
+test('typst constructs get distinct colors', () => {
+  const expected = {
+    'entity.name.function': '#c8a0e0', // semantic "function": #definition, #axiom, notes.with
+    'entity.name.function.typst': '#c8a0e0',
+    'entity.name.function.hash.typst': '#c8a0e0',
+    'support.function.builtin.typst': '#c8a0e0',
+    'keyword.control.import.typst': '#7aaee8', // #import, #show, #set, #let
+    'markup.heading.typst': '#7aaee8',
+    'markup.math.typst': '#80c8c8',
+    'string.other.link.title.typst': '#e0a060', // semantic "label": <eq:1>
+    'string.other.link.typst': '#e0a060', // semantic "ref": @eq:1
+    'markup.other.raw.typst': '#aaccff',
+    'markup.raw.inline.typst': '#aaccff',
+    'string.quoted.double.typst': '#6ec86e',
+    'comment.line.double-slash.typst': '#777777',
+  };
+  const wrong = Object.entries(expected)
+    .filter(([scope, hex]) => syntaxColor(scope) !== hex)
+    .map(([scope, hex]) => `${scope}: ${syntaxColor(scope)}, want ${hex}`);
+  assert.deepStrictEqual(wrong, []);
+});
+
+test('functions stand out from body text', () => {
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(syntaxColor('entity.name.function').slice(i, i + 2), 16));
+  assert.ok(Math.max(r, g, b) - Math.min(r, g, b) > 40, 'function color must have a hue, not be another gray');
+});

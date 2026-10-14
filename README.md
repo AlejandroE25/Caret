@@ -11,7 +11,7 @@ There's no Marketplace listing. Build the `.vsix` and install it:
 
 ```bash
 npm run package
-code --install-extension caret-0.1.0.vsix
+code --install-extension caret-0.2.0.vsix
 ```
 
 Then pick **Caret** from *Preferences: Color Theme*.

@@ -49,7 +49,13 @@ was asked.
 
 Syntax colors: iKB has no syntax palette, so derive one from the tokens above. Keywords `--accent`,
 strings `--green`, numbers and constants `--amber`, comments `--dim` italic, types `--accent-2`,
-functions `--text-strong`, errors `--red`.
+functions lavender `#c8a0e0`, errors `--red`. Lavender and cyan `#80c8c8` are not iKB tokens; they are derived at
+the same lightness for the terminal's magenta and cyan, and reused here because functions in `--text-strong`
+were indistinguishable from body text.
+
+Typst (Tinymist): function calls like `#definition`, `#axiom` and `notes.with` lavender; `#import`, `#show`, `#set`,
+`#let` and headings `--accent`; math cyan; labels and references `--amber`; raw `--accent-2`; strings `--green`;
+bold text `--text-strong`.
 
 ### Acceptance criteria
 
