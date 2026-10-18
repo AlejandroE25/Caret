@@ -1,0 +1,12 @@
+{
+  "nameShort": "Caret",
+  "nameLong": "Caret",
+  "applicationName": "caret",
+  "dataFolderName": ".caret",
+  "darwinBundleIdentifier": "com.alejandroe25.caret",
+  "urlProtocol": "caret",
+  "serverApplicationName": "caret-server",
+  "serverDataFolderName": ".caret-server",
+  "tunnelApplicationName": "caret-tunnel",
+  "reportIssueUrl": "https://github.com/AlejandroE25/Caret/issues/new"
+}

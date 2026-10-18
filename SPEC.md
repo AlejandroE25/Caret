@@ -1,6 +1,6 @@
 # Spec: Caret, a Typst editor carved from VS Code
 
-**Status:** Draft, awaiting approval of the capability map
+**Status:** Capability map approved 2026-10-18. `build` in progress (`SPEC-build.md`).
 **Date:** 2026-10-18
 **Repo:** https://github.com/AlejandroE25/Caret
 
@@ -125,11 +125,9 @@ wherever VS Code allows it:
   working on `Week7.typ` with no setup.
 - VS Code still opens with its own settings, unchanged.
 
-## Open Questions
+## Decisions (2026-10-18)
 
-1. **What to carve.** Which of these stay in Caret: git and source control, the terminal, the debugger,
-   other languages' support (Markdown, Python)? My default would keep git, terminal and Markdown, and remove
-   the rest.
-2. **Disk space.** You have 22 GB free. The build needs several GB; I'll measure it in the `build` module.
-   Is it OK to use `~/Developer/caret-build`?
-3. **Repo layout.** OK to move the theme files into `theme/`?
+1. **What to carve:** keep git and source control, the terminal and Markdown. Other languages may keep
+   minimal built-in support but are not a goal. Remove the debugger and anything else not needed for Typst.
+2. **Build folder:** `~/Developer/caret-build`.
+3. **Repo layout:** the theme moved into `theme/`.

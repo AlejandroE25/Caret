@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 // The theme is JSONC; it only uses whole-line comments, so dropping those lines is enough.
-const raw = fs.readFileSync(path.join(__dirname, '../themes/caret-color-theme.json'), 'utf8');
+const raw = fs.readFileSync(path.join(__dirname, '../theme/themes/caret-color-theme.json'), 'utf8');
 const theme = JSON.parse(raw.split('\n').filter(l => !l.trim().startsWith('//')).join('\n'));
 const known = new Set(require('./vscode-color-keys.json').keys);
 const HEX = /^#[0-9a-f]{6}([0-9a-f]{2})?$/;
