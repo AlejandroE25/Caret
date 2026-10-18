@@ -1,177 +1,140 @@
-# Spec: Caret
+# Spec: Caret, a Typst editor
 
-**Status:** Approved 2026-10-12. Route A (theme only), local `.vsix` install.
+**Status:** Draft, awaiting approval of the capability map
+**Date:** 2026-10-18
 **Repo:** https://github.com/AlejandroE25/Caret
-**Date:** 2026-10-12
 
 ## Objective
 
-Make the code editor I use every day look like my other projects (iKB, the Stacks GUI, Rubric), so my
-tools read as one family. Keep everything VS Code already does: extensions, language servers, debugger,
-git, terminal, Claude Code.
+A macOS app for writing my Typst files, in the iKB design language: flat `#262626`, blue panel headers,
+Arial, square corners. It replaces VS Code for Typst work only. VS Code stays for code.
 
-**User:** me, on macOS, VS Code already installed.
+**User:** me. My Typst files are class notes, problem sets, lab reports and essays in the KnowledgeBase vault,
+almost all built on `@local/manuscript:0.20.0`. A typical notes file is ~150 lines using `#definition`,
+`#axiom`, `#theorem`, `#proof`, `#session`, headings and math.
 
-### The routes, and the one this spec takes
+**What a session looks like:** open the vault (or one class folder), pick a file from the tree, write on the
+left, watch the page update on the right, see errors as I make them, close the app without ever thinking
+about saving.
 
-| Route | Look achieved | Keeps VS Code features | Cost to build | Cost to keep |
-|---|---|---|---|---|
-| **A. Theme extension** (this spec) | Palette, blue panel headers, flat surfaces. Not Arial UI, not outset buttons. | All | ~1 day | Near zero |
-| B. Code-OSS fork, rebranded "Caret" | Everything, including Arial UI, outset buttons, own app icon and name | All, but Microsoft-only extensions (Remote-SSH, Pylance, Live Share) are unavailable | Days. Building Code-OSS needs ~16 GB RAM and ~1 hr per build. | Rebase on upstream every month |
-| C. Own editor (Electron/Tauri + CodeMirror 6) | Everything | None. LSP, debugger, git, extensions all rebuilt by hand. | Months | High |
+### Why not fork VS Code and freeze it
 
-**Decision (2026-10-12): A.** It delivers most of the look in a day and costs nothing to maintain. B stays on
-the table as a later phase if the missing 20% (UI font, button bevels, branding) still bothers me after
-living with A. C only makes sense if the goal changes to "a small focused editor", which is not what
-was asked.
+That route is more viable than it sounded: Tinymist only needs VS Code 1.97, so a fork frozen at 1.141 would
+keep getting Typst updates through Tinymist for a long time. It is not the choice because:
 
-### Design language (source of truth: Rubric `src/index.css`, Stacks GUI `web/style.css`)
+- It is still a general IDE. Making it feel like a Typst editor means hiding most of a huge workbench, not
+  building a small one.
+- Every visual change means editing and rebuilding Code-OSS (multi-GB checkout, ~1 hr builds).
+- Freezing also freezes its Chromium, so it never gets browser security fixes. Low risk for local files, but real.
 
-| Token | Value | Where it lands in VS Code |
+The app below reuses the same engines VS Code would have used for Typst (the Typst compiler inside
+Tinymist), so nothing about Typst support is lost. The fork stays the fallback if the app stalls.
+
+## Capability map
+
+| Module id | Responsibility | Depends on |
 |---|---|---|
-| `--bg` | `#262626` | editor, sidebar, panel, title bar, status bar, activity bar |
-| `--surface` | `#2e2e2e` | widgets, hovers, menus, quick input, notifications |
-| `--input` | `#1e1e1e` | inputs, dropdowns, terminal background |
-| `--border` | `#444` | widget/panel/editor-group borders |
-| `--rule` | `#555` | title bar bottom border (the 2px rule under the iKB header), input borders |
-| `--text` | `#cccccc` | foreground, editor foreground |
-| `--text-strong` | `#e0e0e0` | active tab, selected list item |
-| `--muted` | `#999` | descriptions, inactive tab text |
-| `--dim` | `#777` | line numbers, placeholders |
-| `--accent` | `#7aaee8` | focus border, links, active tab top border, cursor, badges |
-| `--accent-2` | `#aaccff` | link hover |
-| `--accent-fill` | `#3c5070` | **sidebar section headers and panel headers (white bold text)**, primary buttons, selection, status bar item hover |
-| `--red` / fill / line | `#e08080` / `#3a1010` / `#6a2020` | errors, deletions, error toasts |
-| `--amber` / fill / line | `#e0a060` / `#3a2010` / `#6a4020` | warnings, modified files |
-| `--green` / fill / line | `#6ec86e` / `#1a3a1a` / `#3a6a3a` | additions, untracked files |
-| Fonts | UI: Arial. Code: `ui-monospace, Menlo, monospace` (from Stacks GUI) | Editor and terminal font via settings. UI font is out of reach in route A. |
-| Shape | Square corners, flat, no shadows except toasts | VS Code is already mostly square; leftover radii stay in route A |
+| `theme` | Caret palette and syntax colors. Exists today as the VS Code theme (`SPEC-theme.md`), and becomes the single source of colors for the app. | — |
+| `shell` | The Mac app: window, menus, app name and icon, open a folder, file tree, open/save `.typ` files, autosave, restore last folder and file. | `theme` |
+| `editor` | The writing pane: CodeMirror 6 with Typst syntax colors from `theme`, find/replace, undo history, line numbers, soft wrap. | `theme`, `shell` |
+| `preview` | Live page preview beside the editor using Tinymist's preview server. Follows the open file, updates as I type, click a spot to jump to its source. | `shell` |
+| `language` | Tinymist language server: errors and warnings (squiggles plus a problems list), completion, and hover docs, including for manuscript's functions. | `editor` |
 
-Syntax colors: iKB has no syntax palette, so derive one from the tokens above. Keywords `--accent`,
-strings `--green`, numbers and constants `--amber`, comments `--dim` italic, types `--accent-2`,
-functions lavender `#c8a0e0`, errors `--red`. Lavender and cyan `#80c8c8` are not iKB tokens; they are derived at
-the same lightness for the terminal's magenta and cyan, and reused here because functions in `--text-strong`
-were indistinguishable from body text.
+Build order: `theme` (done) → `shell` → `editor` and `preview` in parallel → `language`.
 
-Typst (Tinymist): function calls like `#definition`, `#axiom` and `notes.with` lavender; `#import`, `#show`, `#set`,
-`#let` and headings `--accent`; math cyan; labels and references `--amber`; raw `--accent-2`; strings `--green`;
-bold text `--text-strong`.
+**Version 1** is `shell` + `editor` + `preview`. `language` follows as 1.1. Without it, compile errors still
+show, because the preview reports them.
 
-### Acceptance criteria
+Each module gets its own `SPEC-<id>.md` after this map is approved.
 
-1. Installing `caret-<version>.vsix` adds a color theme named **Caret** to the theme picker.
-2. With Caret active, every token in the table above appears where the table says, with the exact hex value.
-3. Sidebar section headers (OPEN EDITORS, OUTLINE, etc.), panel section headers, the quick-pick title, peek
-   titles and the notification center header read as iKB blue bars with white text. VS Code has no key for
-   the bottom panel's tab-strip background, so that strip stays `--bg` with an `--accent` underline.
-   This needs `"workbench.experimental.modernUI": false`: VS Code 1.141 turns modern UI on by default, and its
-   stylesheet paints every section header with `sideBar.background` using `!important`, which no theme can override.
-4. Primary buttons are `--accent-fill` with a `--accent` 1px border, matching Rubric's `.btn-primary`.
-5. All primary text pairs pass WCAG AA (4.5:1). Secondary text (line numbers, placeholders, descriptions)
-   passes 3:1. A test enforces both.
-6. The theme file contains no color key unknown to VS Code. A test enforces it against VS Code's color registry.
-7. The README gives a copy-paste settings block for the editor and terminal font.
+## Tech Stack (proposed, each one is a new dependency)
 
-## Tech Stack
+| Piece | Choice | Why |
+|---|---|---|
+| App shell | Electron, current stable, pinned at setup | JavaScript only, no Rust toolchain on this Mac; runs Tinymist as a child process |
+| Build | `electron-vite` (dev/build), `electron-builder` (makes `Caret.app`) | Vite is what Rubric uses |
+| UI | React 19 + TypeScript | Same as Rubric |
+| Editor | CodeMirror 6 + `codemirror-lang-typst` 0.6.0 | Small, fast, built-in find/replace; Typst grammar exists |
+| Typst engine | `tinymist` binary, pinned release, downloaded by a setup script with a SHA-256 check | One binary gives preview (`tinymist preview`) and language server (`tinymist lsp`) |
+| Tests | Vitest (unit), Playwright for Electron (end-to-end) | |
 
-- VS Code color theme extension. JSON only, no runtime code.
-- Node.js 24 (installed) with the built-in `node:test` runner. No npm dependencies.
-- `@vscode/vsce` run through `npx` for packaging only, never installed into the project.
-
-## Commands
+## Commands (proposed)
 
 ```bash
-# Try it live: opens a second VS Code window with Caret loaded, then pick "Caret" in the theme picker
-code --extensionDevelopmentPath="$PWD"
-
-# Test: color-key validity and contrast
-node --test
-
-# Package (no LICENSE file yet, so the license prompt is skipped)
-npm run package
-
-# Install the packaged theme into everyday VS Code
-code --install-extension caret-0.1.0.vsix
+npm install              # deps
+npm run setup            # download the pinned tinymist into vendor/, verify its checksum
+npm run dev              # app with hot reload
+npm test                 # unit tests (Vitest) + theme tests
+npm run e2e              # Playwright: launch the app, open a fixture folder, edit, see preview update
+npm run dist             # build Caret.app into dist/
 ```
 
-## Project Structure
+## Project Structure (proposed)
 
 ```
 Caret/
-  SPEC.md                    → this file
-  package.json               → extension manifest: name, version, engines.vscode, contributes.themes
-  themes/caret-color-theme.json → the theme: "colors" (workbench) + "tokenColors" (syntax)
-  test/theme.test.js         → color-key validity + contrast checks
-  test/vscode-color-keys.json → snapshot of VS Code's known color keys (994 in VS Code 1.141), with the version it came from
-  icon.png                   → 128x128, the three-bar favicon motif from the Stacks GUI
-  README.md                  → install steps, font settings block, screenshot
-  CHANGELOG.md
+  SPEC.md                  → this file: objective + capability map
+  SPEC-<module>.md         → one per module
+  theme/                   → the VS Code theme moves here (still installable); its JSON is the color source
+  src/main/                → shell: Electron main process, file system, tinymist processes
+  src/preload/             → the narrow bridge the window is allowed to call
+  src/renderer/            → React UI: file tree, editor, preview pane
+  src/renderer/caret.css   → iKB tokens as CSS variables, generated from theme/
+  vendor/                  → downloaded tinymist (gitignored)
+  test/                    → unit tests
+  e2e/                     → Playwright tests + fixtures/ (a small manuscript-style .typ folder)
+  assets/                  → app icon (exists)
 ```
 
 ## Code Style
 
-The theme file groups keys by workbench area, in the order the table above uses, with the iKB token name in
-a comment only where the value isn't obvious. Hex is lowercase, six digits, alpha appended when needed.
+Rubric's conventions: TypeScript strict, function components, plain CSS with the iKB variables, no CSS
+framework. The window never touches the file system directly; it asks the main process through a short
+list of named calls:
 
-```jsonc
-{
-  "name": "Caret",
-  "type": "dark",
-  "colors": {
-    // base
-    "foreground": "#cccccc",
-    "focusBorder": "#7aaee8",
-    // sidebar: iKB panel headers are blue bars with white bold text
-    "sideBar.background": "#262626",
-    "sideBarSectionHeader.background": "#3c5070",
-    "sideBarSectionHeader.foreground": "#ffffff",
-    // buttons: Rubric .btn-primary
-    "button.background": "#3c5070",
-    "button.hoverBackground": "#46608a",
-    "button.border": "#7aaee8"
-  },
-  "tokenColors": [
-    { "scope": "comment", "settings": { "foreground": "#777777", "fontStyle": "italic" } }
-  ]
-}
+```ts
+// src/preload/index.ts — the whole surface the UI gets
+contextBridge.exposeInMainWorld('caret', {
+  openFolder: (): Promise<string | null> => ipcRenderer.invoke('folder:open'),
+  listTree: (dir: string): Promise<TreeNode[]> => ipcRenderer.invoke('folder:tree', dir),
+  readFile: (path: string): Promise<string> => ipcRenderer.invoke('file:read', path),
+  writeFile: (path: string, text: string): Promise<void> => ipcRenderer.invoke('file:write', path, text),
+})
 ```
-
-Tests are plain `node:test` with `assert`, no helpers beyond a 10-line relative-luminance function.
 
 ## Testing Strategy
 
-- **Unit (automated, `node --test`):**
-  - Every key in `colors` exists in `test/vscode-color-keys.json`. This catches typos, which VS Code ignores silently.
-  - Every hex value parses.
-  - Contrast: a fixed list of foreground/background pairs (e.g. `editor.foreground` on `editor.background`,
-    `sideBarSectionHeader.foreground` on its background) meets 4.5:1. Secondary pairs meet 3:1.
-- **Visual (manual, before each release):** open the Extension Development Host on this repo and walk a checklist:
-  explorer, an open TypeScript file, search, source control with a diff, terminal, a notification, the command
-  palette, settings UI. Compare side by side with Rubric running on `npm run dev`. Save one screenshot to the README.
-- No coverage target: there is no runtime code.
+- **Unit (Vitest):** file tree building and filtering, atomic save, autosave debounce, tinymist process
+  start/stop/restart, generating CSS and editor colors from `theme/`.
+- **End-to-end (Playwright on Electron):** open `e2e/fixtures/notes/`, open `Week.typ`, type a `#definition`,
+  see the preview contain the new text, quit, reopen, see the edit persisted.
+- **Theme:** the existing color tests keep running against `theme/`.
+- **Manual before each release:** a week of real notes in the vault.
 
 ## Boundaries
 
-- **Always:** take color values from the token table, not by eye. Run `node --test` before packaging.
-  Bump `version` and `CHANGELOG.md` on every packaged release.
-- **Ask first:** adding any npm dependency. Changing a token value (that changes the family look, so it
-  probably belongs in Rubric/iKB too). Starting route B. Publishing to the VS Code Marketplace or Open VSX.
-- **Never:** patch files inside `/Applications/Visual Studio Code.app` or use CSS-injection extensions
-  (Custom UI Style, APC). They trip VS Code's "installation is corrupt" warning and break on every update;
-  route B is the honest way to get that control. Never change my global VS Code settings from a script.
+- **Always:** save atomically (write a temp file, then rename), so a crash never leaves a half-written `.typ`.
+  Keep unsaved edits on quit or crash. Take every color from `theme/`. Run unit and e2e tests before a release.
+- **Ask first:** any dependency beyond the table above. Changing the tinymist version. Anything that writes
+  outside the opened folder. Starting `language` before v1 is in use.
+- **Never:** touch files other than the ones I open and save. Run git in the vault; the KnowledgeBase's own
+  tooling commits it. Send anything over the network except Typst's own package downloads (`@preview/...`).
+  Give the window direct file-system or shell access.
 
-## Success Criteria
+## Success Criteria (version 1)
 
-- `node --test` passes.
-- `npm run package` produces a `.vsix` with no warnings.
-- After install and selecting Caret, a side-by-side screenshot with Rubric shows the same background,
-  the same blue header bars, the same accent blue, and the same status colors.
-- I keep it as my daily theme for one week without switching back.
+- `npm run dist` produces `Caret.app` named Caret, with the Caret icon, that opens on double-click.
+- Opening the KnowledgeBase vault shows a tree of its `.typ` files, and opening `CS 173/Notes/Week 7/Week7.typ`
+  shows it highlighted in Caret colors with the page preview beside it.
+- A keystroke shows in the preview within about half a second.
+- Edits are on disk within 2 seconds of the last keystroke, and survive force-quitting the app.
+- The window passes the side-by-side look test against Rubric: background, blue header bars, Arial UI, square corners.
 
-## Decisions
+## Open Questions
 
-1. **Route:** A, theme extension only. Route B (fork) is revisited only after living with A.
-2. **Light mode:** dark-only, like iKB, Stacks and Rubric.
-3. **Code font:** Menlo, from the Stacks GUI.
-4. **Repo:** https://github.com/AlejandroE25/Caret.
-5. **Publishing:** local `.vsix` install only. Marketplace / Open VSX is an ask-first change.
+1. **Version 1 scope.** Is `shell` + `editor` + `preview` the right first cut, with errors-as-you-type and
+   completion (`language`) after? Or must completion be in from day one?
+2. **Tabs.** One file at a time with the tree to switch, or tabs for several open files?
+3. **PDF export.** Your folders keep a `.pdf` next to each `.typ`. Should Caret write that PDF on save, on a
+   menu command, or never?
+4. **Repo layout.** OK to move the theme files into `theme/` in this repo?

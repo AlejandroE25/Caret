@@ -55,7 +55,7 @@ For the window title, add this to your settings:
 
 VS Code has no setting for the interface font, button bevels, corner radius or the bottom panel's tab-strip
 background. So the UI stays in the system font, the Terminal / Problems tab strip stays `#262626` with an
-accent underline, and buttons are flat. Getting those would need a fork of VS Code; see `SPEC.md`.
+accent underline, and buttons are flat. Getting those would need a fork of VS Code; see `SPEC-theme.md`.
 
 ## Develop
 
