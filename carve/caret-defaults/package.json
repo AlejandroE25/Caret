@@ -1,0 +1,19 @@
+{
+  "name": "caret-defaults",
+  "displayName": "Caret Defaults",
+  "description": "Typst-first default settings for Caret. Your own settings still override these.",
+  "publisher": "caret",
+  "version": "1.0.0",
+  "license": "MIT",
+  "engines": { "vscode": "^1.90.0" },
+  "contributes": {
+    "configurationDefaults": {
+      "workbench.colorTheme": "Caret",
+      "workbench.experimental.modernUI": false,
+      "workbench.startupEditor": "none",
+      "editor.fontFamily": "Menlo, monospace",
+      "terminal.integrated.fontFamily": "Menlo",
+      "editor.wordWrap": "on"
+    }
+  }
+}

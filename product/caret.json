@@ -8,5 +8,6 @@
   "serverApplicationName": "caret-server",
   "serverDataFolderName": ".caret-server",
   "tunnelApplicationName": "caret-tunnel",
-  "reportIssueUrl": "https://github.com/AlejandroE25/Caret/issues/new"
+  "reportIssueUrl": "https://github.com/AlejandroE25/Caret/issues/new",
+  "builtInExtensions": []
 }

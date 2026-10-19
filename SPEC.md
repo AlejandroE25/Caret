@@ -1,6 +1,6 @@
 # Spec: Caret, a Typst editor carved from VS Code
 
-**Status:** Capability map approved 2026-10-18. `build` in progress (`SPEC-build.md`).
+**Status:** Capability map approved 2026-10-18. Version 1 (`build` + `carve`) done. Next: `chrome`.
 **Date:** 2026-10-18
 **Repo:** https://github.com/AlejandroE25/Caret
 

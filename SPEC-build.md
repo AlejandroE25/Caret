@@ -1,6 +1,6 @@
 # Spec: build
 
-**Status:** In progress
+**Status:** Done 2026-10-18
 **Module of:** `SPEC.md` (depends on nothing; `carve` and `chrome` depend on it)
 
 ## Objective
@@ -46,3 +46,20 @@ npm run install:app                  # copy into /Applications
 - The extensions view searches Open VSX, and installing Tinymist from it works.
 - A second run, without `--fresh`, rebuilds without downloading VS Code's source again.
 - Measured and recorded here: disk used and time taken by a first build.
+
+## Measured (2026-10-18, this Mac)
+
+| | |
+|---|---|
+| Fresh build, including source download | about 3 minutes |
+| Build folder on disk | 6.3 GB |
+| Caret.app | 868 MB |
+
+## Lessons from the first runs
+
+- **Git LFS is required.** VS Code's source uses it. Installed with `brew install git-lfs`.
+- **The system Node is the Intel build** (`/usr/local/bin/node`), which compiled native modules for x86_64 and
+  broke the app. The script now downloads VSCodium's pinned Node (`.nvmrc`, 24.18.0) for arm64 into the build
+  folder, checks it against nodejs.org's SHA-256 list, and uses only that.
+- **`~/.npm` has 58 cache entries owned by another user** (an old `sudo npm`), so the build uses its own npm
+  cache in the build folder. Fixing `~/.npm` needs `sudo chown`, left to you.
