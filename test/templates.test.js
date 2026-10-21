@@ -32,7 +32,9 @@ for (const t of templates()) {
     try {
       fs.writeFileSync(path.join(dir, 'body.typ'), 'Body text.\n');
       fs.writeFileSync(path.join(dir, 'main.typ'), toTypst(t.text, new Date(2026, 4, 5)));  // zero-padded month and day
-      execFileSync(typst, ['compile', 'main.typ', 'main.pdf'], { cwd: dir, stdio: 'pipe' });
+      // CARET_TYPST_PACKAGE_PATH tests against a manuscript checkout other than the installed one.
+      const pkg = process.env.CARET_TYPST_PACKAGE_PATH ? ['--package-path', process.env.CARET_TYPST_PACKAGE_PATH] : [];
+      execFileSync(typst, ['compile', ...pkg, 'main.typ', 'main.pdf'], { cwd: dir, stdio: 'pipe' });
       assert.ok(fs.statSync(path.join(dir, 'main.pdf')).size > 0);
     } catch (e) {
       throw new Error(`${t.id}: ${e.stderr ? e.stderr.toString() : e.message}`);
