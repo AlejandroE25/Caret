@@ -4,6 +4,7 @@
 #show: article.with(
   title: [⟨1:The Title⟩],
   course: "⟨2:CS 173⟩",
+  netid: "ae42",
   date: datetime(year: ⟨YEAR⟩, month: ⟨MONTH⟩, day: ⟨DAY⟩),
 )
 

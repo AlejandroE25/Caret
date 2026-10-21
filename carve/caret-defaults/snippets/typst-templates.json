@@ -9,6 +9,7 @@
       "#show: article.with(",
       "  title: [${1:The Title}],",
       "  course: \"${2:CS 173}\",",
+      "  netid: \"ae42\",",
       "  date: datetime(year: $CURRENT_YEAR, month: $CURRENT_MONTH, day: $CURRENT_DATE),",
       ")",
       "",
@@ -41,7 +42,7 @@
     "body": [
       "#import \"@local/manuscript:0.20.0\" as manuscript: *",
       "",
-      "#show: cheatsheet.with(course: \"${1:CS 173}\", title: \"${2:Exam 1}\")",
+      "#show: cheatsheet.with(course: \"${1:CS 173}\", title: \"${2:Exam 1}\", netid: \"ae42\")",
       "",
       "= ${3:Topic}",
       "$0"
@@ -172,6 +173,7 @@
       "#show: notes.with(",
       "  course: \"${1:CS 173}\",",
       "  lecture: ${2:1},",
+      "  netid: \"ae42\",",
       "  date: datetime(year: $CURRENT_YEAR, month: $CURRENT_MONTH, day: $CURRENT_DATE),",
       ")",
       "",
@@ -189,6 +191,7 @@
       "#show: notes.with(",
       "  course: \"${1:CS 173}\",",
       "  week: ${2:1},",
+      "  netid: \"ae42\",",
       "  date: datetime(year: $CURRENT_YEAR, month: $CURRENT_MONTH, day: $CURRENT_DATE),",
       ")",
       "",
