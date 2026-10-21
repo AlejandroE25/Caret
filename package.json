@@ -8,6 +8,7 @@
     "theme:package": "cd theme && npm run package",
     "icon": "sh scripts/apply-icon.sh",
     "icon:reset": "sh scripts/apply-icon.sh --reset",
-    "icon:render": "osascript -l JavaScript scripts/render-icon.js \"$PWD/assets/app-icon.svg\" \"$PWD/assets/app-icon.png\""
+    "icon:render": "osascript -l JavaScript scripts/render-icon.js \"$PWD/assets/app-icon.svg\" \"$PWD/assets/app-icon.png\"",
+    "templates": "node scripts/build-templates.js"
   }
 }

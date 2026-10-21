@@ -58,8 +58,10 @@ export PATH="$NODE_DIR/bin:$PATH"
 
 # 5. Build, following VSCodium's dev/build.sh with Caret's names
 set +u  # VSCodium's scripts read variables that are often unset
+# A first build adds ~6 GB; a rebuild reuses the source and replaces its own output, so it needs little.
+NEED_GB=8; git -C vscode rev-parse -q --verify HEAD >/dev/null 2>&1 && NEED_GB=3
 FREE_GB=$(df -g "$BUILD_DIR" | awk 'NR==2 {print $4}')
-[ "$FREE_GB" -ge 12 ] || { echo "Only ${FREE_GB} GB free; the build needs about 12 GB" >&2; exit 1; }
+[ "$FREE_GB" -ge "$NEED_GB" ] || { echo "Only ${FREE_GB} GB free; this build needs about ${NEED_GB} GB" >&2; exit 1; }
 export APP_NAME="Caret" BINARY_NAME="caret" ORG_NAME="AlejandroE25"
 export GH_REPO_PATH="AlejandroE25/Caret" ASSETS_REPOSITORY="AlejandroE25/Caret"
 export CI_BUILD="no" SHOULD_BUILD="yes" SKIP_ASSETS="yes" VSCODE_LATEST="no" VSCODE_QUALITY="stable"
@@ -95,6 +97,7 @@ fi
 # product/caret.json's empty builtInExtensions; its two source extensions are removed after the build.
 step "Carving: built-in Caret theme and defaults, no debugger"
 rm -rf vscode/extensions/caret-theme vscode/extensions/caret-defaults
+node "$ROOT/scripts/build-templates.js"   # Typst file templates from carve/templates
 rsync -a --exclude '*.vsix' "$ROOT/theme/" vscode/extensions/caret-theme/
 rsync -a "$ROOT/carve/caret-defaults/" vscode/extensions/caret-defaults/
 

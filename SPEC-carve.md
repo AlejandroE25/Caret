@@ -42,3 +42,18 @@ rejected defaults in the logs, Tinymist 0.15.10 installed, `Week7.typ` opens wit
 to an extension, so no setting hides them. Removing them needs a source patch; a candidate for `chrome`.
 VS Code's npm install step also expects the `debug-auto-launch` and `debug-server-ready` folders, so the build
 deletes them from the finished app instead of the source.
+
+## Typst file templates (added 2026-10-21)
+
+Nine manuscript templates ship as VS Code file-template snippets (`isFileTemplate`), contributed by
+`caret-defaults`: lecture notes, week of notes, homework, cheat sheet, lab report (from the vault's
+`_Templates/lab-report.typ`), essay, MLA essay, article, book.
+
+- **Source:** `carve/templates/*.typ`, plain Typst with markers: `⟨1:default⟩` tab stops, `⟨0⟩` final cursor,
+  `⟨YEAR⟩ ⟨MONTH⟩ ⟨DAY⟩` today's date.
+- **Generated:** `scripts/build-templates.js` writes `carve/caret-defaults/snippets/typst-templates.json`;
+  the app build regenerates it.
+- **Tested:** the shipped file must match the sources, and every template must compile with the real
+  `typst` and `@local/manuscript:0.20.0`, with a zero-padded date.
+- **Use:** in an empty `.typ` file, the editor offers "fill with template"; or run
+  *Snippets: Fill File with Snippet*; or type `template-` and pick one.

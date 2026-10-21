@@ -5,8 +5,21 @@
   "publisher": "caret",
   "version": "1.0.0",
   "license": "MIT",
-  "engines": { "vscode": "^1.90.0" },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
   "contributes": {
+    "languages": [
+      {
+        "id": "typst",
+        "aliases": [
+          "Typst"
+        ],
+        "extensions": [
+          ".typ"
+        ]
+      }
+    ],
     "configurationDefaults": {
       "workbench.colorTheme": "Caret",
       "workbench.experimental.modernUI": false,
@@ -14,6 +27,12 @@
       "editor.fontFamily": "Menlo, monospace",
       "terminal.integrated.fontFamily": "Menlo",
       "editor.wordWrap": "on"
-    }
+    },
+    "snippets": [
+      {
+        "language": "typst",
+        "path": "./snippets/typst-templates.json"
+      }
+    ]
   }
 }
